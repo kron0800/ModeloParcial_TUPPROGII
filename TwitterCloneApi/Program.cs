@@ -1,6 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using TwitterCloneApi.Models;
+using TwitterCloneApi.Repositories;
+using TwitterCloneApi.Services;
 
 namespace TwitterCloneApi
 {
@@ -22,6 +24,10 @@ namespace TwitterCloneApi
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
 
+            // Inyect services
+            builder.Services.AddScoped<ITweetRepository, TweetRepository>();
+            builder.Services.AddScoped<ITweetService, TweetService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -39,6 +45,7 @@ namespace TwitterCloneApi
             app.MapControllers();
 
             app.Run();
+
         }
     }
 }
