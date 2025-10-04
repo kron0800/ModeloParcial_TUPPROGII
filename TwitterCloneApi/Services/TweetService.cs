@@ -13,7 +13,7 @@ namespace TwitterCloneApi.Services
             _repository = repository;
         }
 
-        public async Task<IEnumerable<TweetDto>> GetTweetsByFiltersAsync(int? userId, string? country)
+        public async Task<IEnumerable<TweetDto>> GetTweetsByFiltersAsync(int? userId, string? country, DateTime? startDate, DateTime? endDate)
         {
             // Get the default linq query
             IQueryable<Tweet> query = _repository.GetQueryable().Where(t => t.IsPublic == true);
@@ -28,6 +28,18 @@ namespace TwitterCloneApi.Services
             if (!string.IsNullOrWhiteSpace(country))
             {
                 query = query.Where(t => t.IdUserNavigation.IdCountryNavigation.Country1.Contains(country));
+            }
+            DateTime now = DateTime.Now;
+            if (startDate != null) 
+            { 
+                if (startDate > now) { throw new Exception("StartDate can't be past today!"); }
+                query = query.Where(t => t.PublishDatetime > startDate);
+            }
+
+            if (endDate != null)
+            {
+                if (endDate > now) { throw new Exception("StartDate can't be past today!"); }
+                query = query.Where(t => t.PublishDatetime < endDate);
             }
 
             // Get a Ienumerable of tweets (model)
@@ -65,6 +77,15 @@ namespace TwitterCloneApi.Services
 
             target.IsPublic = false;
             return await _repository.UpdateAsync(target);
+        }
+
+        public async Task<TweetDto> CreateTweet(CreateTweetDto dto)
+        {
+            Tweet tweet = CreateTweetDto.DtoToEntity(dto);
+
+            Tweet newTweet = await _repository.CreateAsync(tweet);
+
+            return TweetDto.EntityToDto(newTweet);
         }
     }
 }

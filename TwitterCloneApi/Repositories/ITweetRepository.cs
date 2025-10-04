@@ -11,6 +11,6 @@ namespace TwitterCloneApi.Repositories
         //Task<bool> DeleteAsync(Tweet entity); 
         // No hace falta usar un metodo delete si ya tenemos el update para hacer cambios en la bd.
         // Nomas cambiamos estado en el service y lo pasamos por el update
-
+        Task<Tweet> CreateAsync(Tweet entity);
     }
 }

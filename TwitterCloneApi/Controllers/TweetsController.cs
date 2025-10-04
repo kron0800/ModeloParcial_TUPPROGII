@@ -17,11 +17,15 @@ namespace TwitterCloneApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int? userId, [FromQuery]string? country)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int? userId,
+            [FromQuery] string? country,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate )
         {
             try
             {
-                IEnumerable<TweetDto> tweetsDto = await _service.GetTweetsByFiltersAsync(userId, country);
+                IEnumerable<TweetDto> tweetsDto = await _service.GetTweetsByFiltersAsync(userId, country, startDate, endDate);
                 return Ok(new { Status = "success", Data = tweetsDto });   
             }
             catch (Exception ex)
@@ -74,6 +78,20 @@ namespace TwitterCloneApi.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateTweetDto dto)
+        {
+            try
+            {
+                TweetDto tweetDto = await _service.CreateTweet(dto);
+                return Ok(new { Status = "success", Data = tweetDto });
+            }
+            catch (Exception ex)
+            {
+                return ServerError(ex.Message);
+                throw;
+            }
+        }
 
         // Method to return server errors
         private ObjectResult ServerError(string? msg = "Internal server error") =>

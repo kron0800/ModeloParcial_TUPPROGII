@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using TwitterCloneApi.Models;
 
 namespace TwitterCloneApi.Repositories
@@ -32,6 +33,17 @@ namespace TwitterCloneApi.Repositories
             if (entity == null) { throw new Exception("Unable to update given Tweet."); }
             int rowsAffected = await _context.SaveChangesAsync();
             return rowsAffected > 0;
+        }
+
+        public async Task<Tweet> CreateAsync(Tweet entity)
+        {
+            if (entity == null) { throw new Exception("Tweet can't be null."); }
+            EntityEntry<Tweet> entityEntry = _context.Tweets.Add(entity);
+
+            int rowsAffected = await _context.SaveChangesAsync();
+            if (rowsAffected == 0) { throw new Exception("Unable to save given Tweet"); }
+
+            return await GetByIdAsync(entityEntry.Entity.Id);
         }
     }
 }
